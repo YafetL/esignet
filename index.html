@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+    }
+    main {
+      padding: 20px;
+      text-align: center;
+    }
+    .hidden {
+      display: none;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Simple HTML, CSS, and JS App</h1>
+  </header>
+  <main id="main-content">
+    <!-- The content will change dynamically -->
+  </main>
+
+  <script>
+    function getQueryParams() {
+      const hash = window.location.hash || "#/";
+      
+      // Extract the query string part after `?`
+      const queryString = hash.includes("?") ? hash.split("?")[1] : "";
+      const searchParams = new URLSearchParams(queryString);
+
+      return {
+        code: searchParams.get("code"),
+        state: searchParams.get("state"),
+      };
+    }
+
+    // Function to load the Home Page
+    function loadHomePage() {
+      const mainContent = document.getElementById('main-content');
+      mainContent.innerHTML = `
+        <h2>Welcome to the Home Page</h2>
+        <p>This is the home page of the app.</p>
+        <p><a href="/callback" id="test-link">Test Callback Page</a></p>
+      `;
+    }
+
+    // Function to load the Callback Page
+    function loadCallbackPage() {
+      const mainContent = document.getElementById('main-content');
+
+      // Extract query parameters from the URL
+      // const queryParams = new URLSearchParams(window.location.search);
+      // const code = queryParams.get('code') || 'Not Provided';
+      // const state = queryParams.get('state') || 'Not Provided';
+      const { code, state } = getQueryParams();
+
+      mainContent.innerHTML = `
+        <h2>Callback Page</h2>
+        <p>Here are the parameters received in the URL:</p>
+        <ul>
+          <li><strong>Code:</strong> ${code || 'Not Provided'}</li>
+          <li><strong>State:</strong> ${state || 'Not Provided'}</li>
+        </ul>
+        <p><a href="/" id="back-home">Go Back to Home</a></p>
+      `;
+    }
+
+    // // Simple routing based on the URL path
+    // function router() {
+    //   const path = window.location.pathname;
+
+    //   if (path === '/' || path === '/index.html') {
+    //     loadHomePage();
+    //   } else if (path === '/callback') {
+    //     loadCallbackPage();
+    //   } else {
+    //     const mainContent = document.getElementById('main-content');
+    //     mainContent.innerHTML = `
+    //       <h2>404 - Page Not Found</h2>
+    //       <p><a href="/" id="back-home">Go Back to Home</a></p>
+    //     `;
+    //   }
+    // }
+
+    // // Handle clicks on internal links to prevent full page reload
+    // document.body.addEventListener('click', (event) => {
+    //   if (event.target.tagName === 'A' && event.target.id !== 'test-link') {
+    //     event.preventDefault();
+    //     const href = event.target.getAttribute('href');
+    //     window.history.pushState({}, '', href);
+    //     router();
+    //   }
+    // });
+
+    // // Load the correct page on initial load and when history changes
+    // window.addEventListener('popstate', router);
+    // router();
+    function router() {
+  const path = window.location.hash || "#/";
+
+  if (path === "#/") {
+    loadHomePage();
+  } else if (path.includes("#/callback")) {
+    loadCallbackPage();
+  } else {
+    const mainContent = document.getElementById("main-content");
+    mainContent.innerHTML = `
+      <h2>404 - Page Not Found</h2>
+      <p><a href="#/" id="back-home">Go Back to Home</a></p>
+    `;
+  }
+}
+
+document.body.addEventListener("click", (event) => {
+  if (event.target.tagName === "A") {
+    event.preventDefault();
+    const href = event.target.getAttribute("href");
+    window.location.hash = href.replace("/", "#/");
+  }
+});
+
+window.addEventListener("hashchange", router);
+window.addEventListener("load", router);
+  </script>
+</body>
+</html>
